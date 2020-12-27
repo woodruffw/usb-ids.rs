@@ -30,6 +30,8 @@ struct CGInterface {
     name: String,
 }
 
+
+#[allow(clippy::redundant_field_names)]
 fn main() {
     // Regexp line patterns.
     let vendor_line = Regex::new(r"^(?P<id>[[:xdigit:]]{4})\s{2}(?P<name>.+)$").unwrap();
@@ -72,7 +74,6 @@ fn main() {
 
             // Set our new vendor as the current vendor.
             prev_vendor = curr_vendor;
-            #[allow(clippy::redundant_field_names)]
             curr_vendor = Some(CGVendor {
                 id: id,
                 name: name.into(),
@@ -84,7 +85,6 @@ fn main() {
 
             // We should always have a current vendor; failure here indicates a malformed input.
             let curr_vendor = curr_vendor.as_mut().unwrap();
-            #[allow(clippy::redundant_field_names)]
             curr_vendor.devices.push(CGDevice {
                 id: id,
                 name: name.into(),
@@ -105,7 +105,6 @@ fn main() {
                 .find(|d| d.id == curr_device_id)
                 .unwrap();
 
-            #[allow(clippy::redundant_field_names)]
             curr_device.interfaces.push(CGInterface {
                 id: id,
                 name: name.into(),
