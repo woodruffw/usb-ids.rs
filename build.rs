@@ -30,7 +30,6 @@ struct CGInterface {
     name: String,
 }
 
-
 #[allow(clippy::redundant_field_names)]
 fn main() {
     // Regexp line patterns.
