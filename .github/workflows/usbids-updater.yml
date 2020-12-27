@@ -1,0 +1,26 @@
+name: check for updates to usb.ids
+on:
+  schedule:
+    - cron: '0 12 * * *'
+
+jobs:
+  check-usbids:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: download usb.ids
+        curl -o src/usb.ids http://www.linux-usb.org/usb.ids
+      - name: create PR
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: "[BOT] update usb.ids"
+          branch: update-usbids
+          branch-suffix: timestamp
+          title: "[BOT] update usb.ids"
+          body: |
+            This is an automated pull request, updating `usb.ids` after a detected change.
+
+            Its contents come from a trusted source, but are **not** authenticated.
+            Please review them manually before merging.
+          assignees: "woodruffw"
+          reviewers: "woodruffw"
