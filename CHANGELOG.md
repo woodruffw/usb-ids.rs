@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 * Added `Device::from_vid_pid`.
 
-## [0.0.1] - ReleaseDate
+## [0.0.1] - 2020-12-26
 
 ### Added
 
