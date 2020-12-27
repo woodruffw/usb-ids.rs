@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - ReleaseDate
 
+## [0.0.2] - 2020-12-26
+
 ### Added
 
 * Added `Device::from_vid_pid`.
@@ -19,5 +21,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 * This is the initial release of `usb-ids`.
 
 <!-- @next-url@ -->
-[Unreleased]: https://github.com/woodruffw/kbs2/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/woodruffw/kbs2/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/woodruffw/kbs2/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/woodruffw/kbs2/releases/tag/v0.0.1
