@@ -77,6 +77,14 @@ pub struct Device {
 }
 
 impl Device {
+    /// Returns the [`Device`] corresponding to the given vendor and product IDs,
+    /// or `None` if no such device exists in the DB.
+    pub fn from_vid_pid(vid: u16, pid: u16) -> Option<&'static Device> {
+        let vendor = Vendor::from_id(vid);
+
+        vendor.and_then(|v| v.devices().find(|d| d.id == pid))
+    }
+
     /// Returns the [`Vendor`] that this device belongs to.
     ///
     /// Looking up a vendor by device is cheap (`O(1)`).
@@ -171,5 +179,21 @@ mod tests {
             assert_eq!(device.vendor(), vendor);
             assert!(!device.name().is_empty());
         }
+    }
+
+    #[test]
+    fn test_from_vid_pid() {
+        let device = Device::from_vid_pid(0x1d6b, 0x0003).unwrap();
+
+        assert_eq!(device.name(), "3.0 root hub");
+
+        let (vid, pid) = device.as_vid_pid();
+
+        assert_eq!(vid, device.vendor().id());
+        assert_eq!(pid, device.id());
+
+        let device2 = Device::from_vid_pid(vid, pid).unwrap();
+
+        assert_eq!(device, device2);
     }
 }
