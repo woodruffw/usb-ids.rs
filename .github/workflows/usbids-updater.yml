@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: download usb.ids
-        curl -o src/usb.ids http://www.linux-usb.org/usb.ids
+        curl -o src/usb.ids https://usb-ids.gowdy.us/usb.ids
       - name: create PR
         uses: peter-evans/create-pull-request@v3
         with:
@@ -20,7 +20,6 @@ jobs:
           body: |
             This is an automated pull request, updating `usb.ids` after a detected change.
 
-            Its contents come from a trusted source, but are **not** authenticated.
-            Please review them manually before merging.
+            Please review manually before merging.
           assignees: "woodruffw"
           reviewers: "woodruffw"
