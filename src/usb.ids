@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2021.01.26
-# Date:    2021-01-26 20:34:10
+# Version: 2021.01.29
+# Date:    2021-01-29 20:34:11
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -8756,6 +8756,7 @@
 05fc  Harman
 	0001  Soundcraft Si Multi Digital Card
 	0010  Soundcraft Si MADI combo card
+	0021  Soundcraft Signature 12 MTK
 	7849  Harman/Kardon SoundSticks
 05fd  InterAct, Inc.
 	0239  SV-239 HammerHead Digital
