@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+* Routine DB update (2021-01-29 20:34:11)
+
 ## [0.0.2] - 2020-12-26
 
 ### Added
