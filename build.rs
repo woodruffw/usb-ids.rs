@@ -13,19 +13,19 @@ use regex::Regex;
 
 type VMap = Map<u16>;
 
-struct CGVendor {
+struct CgVendor {
     id: u16,
     name: String,
-    devices: Vec<CGDevice>,
+    devices: Vec<CgDevice>,
 }
 
-struct CGDevice {
+struct CgDevice {
     id: u16,
     name: String,
-    interfaces: Vec<CGInterface>,
+    interfaces: Vec<CgInterface>,
 }
 
-struct CGInterface {
+struct CgInterface {
     id: u8,
     name: String,
 }
@@ -50,8 +50,8 @@ fn main() {
     };
 
     // Parser state.
-    let mut prev_vendor: Option<CGVendor> = None;
-    let mut curr_vendor: Option<CGVendor> = None;
+    let mut prev_vendor: Option<CgVendor> = None;
+    let mut curr_vendor: Option<CgVendor> = None;
     let mut curr_device_id = 0u16;
 
     let mut map = emit_prologue(&mut output);
@@ -73,7 +73,7 @@ fn main() {
 
             // Set our new vendor as the current vendor.
             prev_vendor = curr_vendor;
-            curr_vendor = Some(CGVendor {
+            curr_vendor = Some(CgVendor {
                 id: id,
                 name: name.into(),
                 devices: vec![],
@@ -84,7 +84,7 @@ fn main() {
 
             // We should always have a current vendor; failure here indicates a malformed input.
             let curr_vendor = curr_vendor.as_mut().unwrap();
-            curr_vendor.devices.push(CGDevice {
+            curr_vendor.devices.push(CgDevice {
                 id: id,
                 name: name.into(),
                 interfaces: vec![],
@@ -104,7 +104,7 @@ fn main() {
                 .find(|d| d.id == curr_device_id)
                 .unwrap();
 
-            curr_device.interfaces.push(CGInterface {
+            curr_device.interfaces.push(CgInterface {
                 id: id,
                 name: name.into(),
             });
@@ -127,7 +127,7 @@ fn emit_prologue(output: &mut impl Write) -> VMap {
     Map::new()
 }
 
-fn emit_vendor(map: &mut VMap, vendor: &CGVendor) {
+fn emit_vendor(map: &mut VMap, vendor: &CgVendor) {
     map.entry(
         vendor.id,
         format!(
@@ -140,7 +140,7 @@ fn emit_vendor(map: &mut VMap, vendor: &CGVendor) {
     );
 }
 
-fn build_device_list(vendor_id: u16, devices: &[CGDevice]) -> String {
+fn build_device_list(vendor_id: u16, devices: &[CgDevice]) -> String {
     // SWAG: Each device repr is probably around 64 bytes (including commas),
     // so give ourselves about that much space per device.
     let mut list = String::with_capacity(64 * devices.len());
@@ -152,7 +152,7 @@ fn build_device_list(vendor_id: u16, devices: &[CGDevice]) -> String {
     list
 }
 
-fn build_device(vendor_id: u16, device: &CGDevice) -> String {
+fn build_device(vendor_id: u16, device: &CgDevice) -> String {
     format!(
         "Device {{ vendor_id: {}, id: {}, name: r###\"{}\"###, interfaces: &[{}] }}",
         vendor_id,
@@ -162,7 +162,7 @@ fn build_device(vendor_id: u16, device: &CGDevice) -> String {
     )
 }
 
-fn build_interface_list(interfaces: &[CGInterface]) -> String {
+fn build_interface_list(interfaces: &[CgInterface]) -> String {
     // SWAG: Each interfaces repr is probably around 64 bytes (including commas),
     // so give ourselves about that much space per interfaces.
     let mut list = String::with_capacity(64 * interfaces.len());
