@@ -4,6 +4,7 @@ use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::path::Path;
 
 use phf_codegen::Map;
+use quote::quote;
 use regex::Regex;
 
 /* This build script contains a "parser" for the USB ID database.
@@ -131,58 +132,37 @@ fn emit_prologue(output: &mut impl Write) -> VMap {
 }
 
 fn emit_vendor(map: &mut VMap, vendor: &CgVendor) {
-    map.entry(
-        vendor.id,
-        format!(
-            "Vendor {{ id: {}, name: r###\"{}\"###, devices: &[{}] }}",
-            vendor.id,
-            &vendor.name,
-            build_device_list(vendor.id, &vendor.devices)
-        )
-        .as_str(),
-    );
-}
-
-fn build_device_list(vendor_id: u16, devices: &[CgDevice]) -> String {
-    // SWAG: Each device repr is probably around 64 bytes (including commas),
-    // so give ourselves about that much space per device.
-    let mut list = String::with_capacity(64 * devices.len());
-    for device in devices.iter() {
-        list.push_str(build_device(vendor_id, &device).as_str());
-        list.push_str(", ");
-    }
-
-    list
-}
-
-fn build_device(vendor_id: u16, device: &CgDevice) -> String {
-    format!(
-        "Device {{ vendor_id: {}, id: {}, name: r###\"{}\"###, interfaces: &[{}] }}",
-        vendor_id,
-        device.id,
-        &device.name,
-        build_interface_list(&device.interfaces)
-    )
-}
-
-fn build_interface_list(interfaces: &[CgInterface]) -> String {
-    // SWAG: Each interfaces repr is probably around 64 bytes (including commas),
-    // so give ourselves about that much space per interfaces.
-    let mut list = String::with_capacity(64 * interfaces.len());
-    for interface in interfaces.iter() {
-        list.push_str(
-            format!(
-                "Interface {{ id: {}, name: r###\"{}\"### }}",
-                interface.id, &interface.name
-            )
-            .as_str(),
-        );
-        list.push_str(", ");
-    }
-
-    list
+    map.entry(vendor.id, &quote!(#vendor).to_string());
 }
 
 fn emit_epilogue(output: &mut impl Write, map: VMap) {
     writeln!(output, "{};", map.build()).unwrap();
+}
+
+impl quote::ToTokens for CgVendor {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let CgVendor {
+            id: vendor_id,
+            name,
+            devices,
+        } = self;
+
+        let devices = devices.iter().map(|CgDevice { id, name, interfaces }| {
+            quote!{
+                Device { vendor_id: #vendor_id, id: #id, name: #name, interfaces: &[#(#interfaces),*] }
+            }
+        });
+        tokens.extend(quote! {
+            Vendor { id: #vendor_id, name: #name, devices: &[#(#devices),*] }
+        });
+    }
+}
+
+impl quote::ToTokens for CgInterface {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let CgInterface { id, name } = self;
+        tokens.extend(quote! {
+            Interface { id: #id, name: #name }
+        });
+    }
 }
