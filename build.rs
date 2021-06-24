@@ -114,6 +114,9 @@ fn main() {
             break;
         }
     }
+    if let Some(vendor) = curr_vendor.take() {
+        emit_vendor(&mut map, &vendor);
+    }
 
     emit_epilogue(&mut output, map);
 
