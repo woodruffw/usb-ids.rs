@@ -12,8 +12,8 @@ keywords = ["usb"]
 categories = ["hardware-support"]
 
 [build-dependencies]
+nom = { version = "6.2", default-features = false }
 phf_codegen = "0.8"
-regex = "1.4"
 quote = "1.0"
 proc-macro2 = "1.0"
 

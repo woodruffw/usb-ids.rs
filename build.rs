@@ -5,7 +5,6 @@ use std::path::Path;
 
 use phf_codegen::Map;
 use quote::quote;
-use regex::Regex;
 
 /* This build script contains a "parser" for the USB ID database.
  * "Parser" is in scare-quotes because it's really a line matcher with a small amount
@@ -33,11 +32,6 @@ struct CgInterface {
 
 #[allow(clippy::redundant_field_names)]
 fn main() {
-    // Regexp line patterns.
-    let vendor_line = Regex::new(r"^(?P<id>[[:xdigit:]]{4})\s{2}(?P<name>.+)$").unwrap();
-    let device_line = Regex::new(r"^\t(?P<id>[[:xdigit:]]{4})\s{2}(?P<name>.+)$").unwrap();
-    let interface_line = Regex::new(r"^\t\t(?P<id>[[:xdigit]]{2})\s{2}(?P<name>.+)$").unwrap();
-
     let out_dir = env::var_os("OUT_DIR").unwrap();
     let src_path = Path::new("src/usb.ids");
     let dest_path = Path::new(&out_dir).join("usb_ids.cg.rs");
@@ -63,10 +57,7 @@ fn main() {
             continue;
         }
 
-        if let Some(captures) = vendor_line.captures(&line) {
-            let id = u16::from_str_radix(&captures["id"], 16).unwrap();
-            let name = &captures["name"];
-
+        if let Ok((name, id)) = parser::vendor(&line) {
             // If there was a previous vendor, emit it.
             if let Some(vendor) = prev_vendor {
                 emit_vendor(&mut map, &vendor);
@@ -79,10 +70,7 @@ fn main() {
                 name: name.into(),
                 devices: vec![],
             });
-        } else if let Some(captures) = device_line.captures(&line) {
-            let id = u16::from_str_radix(&captures["id"], 16).unwrap();
-            let name = &captures["name"];
-
+        } else if let Ok((name, id)) = parser::device(&line) {
             // We should always have a current vendor; failure here indicates a malformed input.
             let curr_vendor = curr_vendor.as_mut().unwrap();
             curr_vendor.devices.push(CgDevice {
@@ -91,10 +79,7 @@ fn main() {
                 interfaces: vec![],
             });
             curr_device_id = id;
-        } else if let Some(captures) = interface_line.captures(&line) {
-            let id = u8::from_str_radix(&captures["id"], 16).unwrap();
-            let name = &captures["name"];
-
+        } else if let Ok((name, id)) = parser::interface(&line) {
             // We should always have a current vendor; failure here indicates a malformed input.
             // Similarly, our current vendor should always have a device corresponding
             // to the current device id.
@@ -123,6 +108,42 @@ fn main() {
 
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/usb.ids");
+}
+
+mod parser {
+    use std::num::ParseIntError;
+
+    use nom::bytes::complete::{tag, take};
+    use nom::character::complete::{hex_digit1, tab};
+    use nom::combinator::{all_consuming, map_parser, map_res};
+    use nom::sequence::{delimited, terminated};
+    use nom::IResult;
+
+    fn id<T, F>(size: usize, from_str_radix: F) -> impl Fn(&str) -> IResult<&str, T>
+    where
+        F: Fn(&str, u32) -> Result<T, ParseIntError>,
+    {
+        move |input| {
+            map_res(map_parser(take(size), all_consuming(hex_digit1)), |input| {
+                from_str_radix(input, 16)
+            })(input)
+        }
+    }
+
+    pub fn vendor(input: &str) -> IResult<&str, u16> {
+        let id = id(4, u16::from_str_radix);
+        terminated(id, tag("  "))(input)
+    }
+
+    pub fn device(input: &str) -> IResult<&str, u16> {
+        let id = id(4, u16::from_str_radix);
+        delimited(tab, id, tag("  "))(input)
+    }
+
+    pub fn interface(input: &str) -> IResult<&str, u8> {
+        let id = id(2, u8::from_str_radix);
+        delimited(tag("\t\t"), id, tag("  "))(input)
+    }
 }
 
 fn emit_prologue(output: &mut impl Write) -> VMap {
