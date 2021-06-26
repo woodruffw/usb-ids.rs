@@ -45,7 +45,6 @@ fn main() {
     };
 
     // Parser state.
-    let mut prev_vendor: Option<CgVendor> = None;
     let mut curr_vendor: Option<CgVendor> = None;
     let mut curr_device_id = 0u16;
 
@@ -59,14 +58,13 @@ fn main() {
 
         if let Ok((name, id)) = parser::vendor(&line) {
             // If there was a previous vendor, emit it.
-            if let Some(vendor) = prev_vendor {
+            if let Some(vendor) = curr_vendor.take() {
                 emit_vendor(&mut map, &vendor);
             }
 
             // Set our new vendor as the current vendor.
-            prev_vendor = curr_vendor;
             curr_vendor = Some(CgVendor {
-                id: id,
+                id,
                 name: name.into(),
                 devices: vec![],
             });
@@ -74,7 +72,7 @@ fn main() {
             // We should always have a current vendor; failure here indicates a malformed input.
             let curr_vendor = curr_vendor.as_mut().unwrap();
             curr_vendor.devices.push(CgDevice {
-                id: id,
+                id,
                 name: name.into(),
                 interfaces: vec![],
             });
@@ -91,7 +89,7 @@ fn main() {
                 .unwrap();
 
             curr_device.interfaces.push(CgInterface {
-                id: id,
+                id,
                 name: name.into(),
             });
         } else {
