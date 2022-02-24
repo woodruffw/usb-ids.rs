@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2022.02.15
-# Date:    2022-02-15 20:34:10
+# Version: 2022.02.23
+# Date:    2022-02-23 20:34:10
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -23296,7 +23296,6 @@
 	0032  AX210 Bluetooth
 	0716  Modem Flashloader
 	07da  Centrino Bluetooth Wireless Transceiver
-		8087 07da  Centrino Advanced-N 6235
 	07db  Atom C2000 Root Hub
 	07dc  Bluetooth wireless interface
 	07eb  Oaktrail tablet
