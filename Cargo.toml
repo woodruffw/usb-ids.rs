@@ -24,8 +24,8 @@ phf = "0.9"
 maintenance = { status = "actively-developed" }
 
 [package.metadata.release]
-no-dev-version = true
-disable-publish = true # handled by GitHub Actions
+dev-version = false
+publish = false # handled by GitHub Actions
 
 [[package.metadata.release.pre-release-replacements]]
 file = "CHANGELOG.md"
