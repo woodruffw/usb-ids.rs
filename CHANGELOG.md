@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - ReleaseDate
 
+## [0.2.2] - 2022-03-29
+
 ### Changed
 
 * DB: Updates to the USB DB (+146, -15)
@@ -37,7 +39,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 * This is the initial release of `usb-ids`.
 
 <!-- @next-url@ -->
-[Unreleased]: https://github.com/woodruffw/usb-ids.rs/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/woodruffw/kbs2/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/woodruffw/usb-ids.rs/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/woodruffw/usb-ids.rs/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/woodruffw/usb-ids.rs/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/woodruffw/usb-ids.rs/compare/v0.0.3...v0.1.0
