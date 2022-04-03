@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2022.03.18
-# Date:    2022-03-18 20:34:09
+# Version: 2022.04.02
+# Date:    2022-04-02 20:34:10
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -14964,6 +14964,10 @@
 0e23  Liou Yuane Enterprise Co., Ltd
 0e25  VinChip Systems, Inc.
 0e26  J-Phone East Co., Ltd
+0e2e  Brady Worldwide, Inc.
+	000b  BMP 51
+	000c  BMP 61
+	000d  BMP 41
 0e30  HeartMath LLC
 0e34  Micro Computer Control Corp.
 0e35  3Pea Technologies, Inc.
