@@ -40,7 +40,7 @@ impl Vendors {
 ///
 /// Every device vendor has a vendor ID, a pretty name, and a
 /// list of associated [`Device`]s.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Vendor {
     id: u16,
     name: &'static str,
@@ -68,7 +68,7 @@ impl Vendor {
 ///
 /// Every device has a corresponding vendor, a device ID, a pretty name,
 /// and a list of associated [`Interface`]s.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Device {
     vendor_id: u16,
     id: u16,
@@ -126,7 +126,7 @@ impl Device {
 /// **NOTE**: The USB database is not a canonical or authoritative source
 /// of interface information for devices. Users who wish to discover interfaces
 /// on their USB devices should query those devices directly.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Interface {
     id: u8,
     name: &'static str,
