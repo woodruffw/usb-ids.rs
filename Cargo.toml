@@ -24,7 +24,6 @@ phf = "0.9"
 maintenance = { status = "actively-developed" }
 
 [package.metadata.release]
-dev-version = false
 publish = false # handled by GitHub Actions
 
 [[package.metadata.release.pre-release-replacements]]
