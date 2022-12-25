@@ -8,7 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+* The date-style versioning used by this crate is now
+  (`v1.YYYY.MMDD`), where `1` indicates the current API version
+  and `YYYY.MMDD` is the date of release.
+
 ## [2022.12.24] - 2022-12-25
+
+**YANKED**.
 
 ### Changed
 
