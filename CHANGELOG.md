@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - ReleaseDate
 
+## [2022.12.24] - 2022-12-25
+
 ### Changed
 
 * This crate now uses date-style versioning (`vYYYY.MM.DD`)
@@ -51,7 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 * This is the initial release of `usb-ids`.
 
 <!-- @next-url@ -->
-[Unreleased]: https://github.com/woodruffw/kbs2/compare/v0.2.5...HEAD
+[Unreleased]: https://github.com/woodruffw/kbs2/compare/v2022.12.24...HEAD
+[2022.12.24]: https://github.com/woodruffw/kbs2/compare/v0.2.5...v2022.12.24
 [0.2.5]: https://github.com/woodruffw/kbs2/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/woodruffw/kbs2/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/woodruffw/kbs2/compare/v0.2.2...v0.2.3
