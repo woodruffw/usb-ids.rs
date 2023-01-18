@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - ReleaseDate
 
+## [1.2023.0] - 2023-01-18
+
 * The date-style versioning used by this crate is now
   (`v1.YYYY.SEQUENCE`), where `1` indicates the current API version,
   `YYYY` is the current year, and `SEQUENCE` is an increasing sequence number
@@ -69,7 +71,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 * This is the initial release of `usb-ids`.
 
 <!-- @next-url@ -->
-[Unreleased]: https://github.com/woodruffw/kbs2/compare/v1.2022.1224...HEAD
+[Unreleased]: https://github.com/woodruffw/kbs2/compare/v1.2023.0...HEAD
+[1.2023.0]: https://github.com/woodruffw/kbs2/compare/v1.2022.1224...v1.2023.0
 [1.2022.1224]: https://github.com/woodruffw/kbs2/compare/v2022.12.24...v1.2022.1224
 [2022.12.24]: https://github.com/woodruffw/kbs2/compare/v0.2.5...v2022.12.24
 [0.2.5]: https://github.com/woodruffw/kbs2/compare/v0.2.4...v0.2.5
