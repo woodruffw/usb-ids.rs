@@ -25,6 +25,7 @@ maintenance = { status = "actively-developed" }
 
 [package.metadata.release]
 publish = false # handled by GitHub Actions
+push = true
 
 [[package.metadata.release.pre-release-replacements]]
 file = "CHANGELOG.md"
