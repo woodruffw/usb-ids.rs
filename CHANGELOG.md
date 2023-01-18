@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - ReleaseDate
 
+* The date-style versioning used by this crate is now
+  (`v1.YYYY.SEQUENCE`), where `1` indicates the current API version,
+  `YYYY` is the current year, and `SEQUENCE` is an increasing sequence number
+  for the year. This was changed to prevent versions that would otherwise
+  be illegal in the crate ecosystem, like `v1.2023.0117`.
+
 ## [1.2022.1224] - 2022-12-25
 
 ### Changed
