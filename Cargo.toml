@@ -54,5 +54,5 @@ exactly = 1
 [[package.metadata.release.pre-release-replacements]]
 file = "CHANGELOG.md"
 search = "<!-- @next-url@ -->"
-replace = "<!-- @next-url@ -->\n[Unreleased]: https://github.com/woodruffw/kbs2/compare/{{tag_name}}...HEAD"
+replace = "<!-- @next-url@ -->\n[Unreleased]: https://github.com/woodruffw/usb-ids.rs/compare/{{tag_name}}...HEAD"
 exactly = 1

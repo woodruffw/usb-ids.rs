@@ -71,13 +71,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 * This is the initial release of `usb-ids`.
 
 <!-- @next-url@ -->
-[Unreleased]: https://github.com/woodruffw/kbs2/compare/v1.2023.0...HEAD
-[1.2023.0]: https://github.com/woodruffw/kbs2/compare/v1.2022.1224...v1.2023.0
-[1.2022.1224]: https://github.com/woodruffw/kbs2/compare/v2022.12.24...v1.2022.1224
-[2022.12.24]: https://github.com/woodruffw/kbs2/compare/v0.2.5...v2022.12.24
-[0.2.5]: https://github.com/woodruffw/kbs2/compare/v0.2.4...v0.2.5
-[0.2.4]: https://github.com/woodruffw/kbs2/compare/v0.2.3...v0.2.4
-[0.2.3]: https://github.com/woodruffw/kbs2/compare/v0.2.2...v0.2.3
+[Unreleased]: https://github.com/woodruffw/usb-ids.rs/compare/v1.2023.0...HEAD
+[1.2023.0]: https://github.com/woodruffw/usb-ids.rs/compare/v1.2022.1224...v1.2023.0
+[1.2022.1224]: https://github.com/woodruffw/usb-ids.rs/compare/v2022.12.24...v1.2022.1224
+[2022.12.24]: https://github.com/woodruffw/usb-ids.rs/compare/v0.2.5...v2022.12.24
+[0.2.5]: https://github.com/woodruffw/usb-ids.rs/compare/v0.2.4...v0.2.5
+[0.2.4]: https://github.com/woodruffw/usb-ids.rs/compare/v0.2.3...v0.2.4
+[0.2.3]: https://github.com/woodruffw/usb-ids.rs/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/woodruffw/usb-ids.rs/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/woodruffw/usb-ids.rs/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/woodruffw/usb-ids.rs/compare/v0.1.0...v0.2.0
