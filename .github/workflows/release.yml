@@ -6,21 +6,24 @@ on:
 name: release
 
 jobs:
-  release:
+  create-release:
+    name: create GitHub release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: ${{ contains(github.ref, 'pre') || contains(github.ref, 'rc') }}
+
+  publish:
+    needs:
+      - create-release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: ${{ contains(github.ref, 'pre') || contains(github.ref, 'rc') }}
+      - uses: actions/checkout@v3
 
       - name: publish to crates.io
         run: |
