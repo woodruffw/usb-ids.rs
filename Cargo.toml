@@ -13,7 +13,7 @@ categories = ["hardware-support"]
 
 [build-dependencies]
 nom = { version = "7.0", default-features = false }
-phf_codegen = "0.9"
+phf_codegen = "0.11"
 quote = "1.0"
 proc-macro2 = "1.0"
 
