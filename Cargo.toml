@@ -2,7 +2,7 @@
 name = "usb-ids"
 description = "Rust wrappers for the USB ID Repository"
 license-file = "LICENSE"
-version = "1.2023.2"
+version = "1.2023.3"
 authors = ["William Woodruff <william@yossarian.net>"]
 edition = "2018"
 readme = "README.md"
