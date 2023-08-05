@@ -18,7 +18,7 @@ quote = "1.0"
 proc-macro2 = "1.0"
 
 [dependencies]
-phf = "0.9"
+phf = "0.11"
 
 [badges]
 maintenance = { status = "actively-developed" }
