@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - ReleaseDate
 
+## [1.2023.5] - 2023-08-25
+
 ## [1.2023.4] - 2023-08-19
 
 ## [1.2023.3] - 2023-08-05
@@ -79,7 +81,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 * This is the initial release of `usb-ids`.
 
 <!-- @next-url@ -->
-[Unreleased]: https://github.com/woodruffw/usb-ids.rs/compare/v1.2023.4...HEAD
+[Unreleased]: https://github.com/woodruffw/usb-ids.rs/compare/v1.2023.5...HEAD
+[1.2023.5]: https://github.com/woodruffw/usb-ids.rs/compare/v1.2023.4...v1.2023.5
 [1.2023.4]: https://github.com/woodruffw/usb-ids.rs/compare/v1.2023.3...v1.2023.4
 [1.2023.3]: https://github.com/woodruffw/usb-ids.rs/compare/v1.2023.2...v1.2023.3
 [1.2023.2]: https://github.com/woodruffw/usb-ids.rs/compare/v1.2023.1...v1.2023.2
