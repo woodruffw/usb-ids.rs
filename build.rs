@@ -11,6 +11,7 @@ use quote::quote;
  * of context needed for pairing nested entities (e.g. devices) with their parents (e.g. vendors).
  */
 
+// these are the definitions for the generated maps
 const VENDOR_PROLOGUE: &str = "static USB_IDS: phf::Map<u16, Vendor> = ";
 const CLASS_PROLOGUE: &str = "static USB_CLASSES: phf::Map<u8, Class> = ";
 const AUDIO_TERMINAL_PROLOGUE: &str = "static USB_AUDIO_TERMINALS: phf::Map<u16, AudioTerminal> = ";
@@ -34,30 +35,10 @@ struct CgVendor {
     devices: Vec<CgDevice>,
 }
 
-impl CgEntry<u16> for CgVendor {
-    fn id(&self) -> u16 {
-        self.id
-    }
-
-    fn name(&self) -> &str {
-        &self.name
-    }
-}
-
 struct CgDevice {
     id: u16,
     name: String,
     interfaces: Vec<CgInterface>,
-}
-
-impl CgEntry<u16> for CgDevice {
-    fn id(&self) -> u16 {
-        self.id
-    }
-
-    fn name(&self) -> &str {
-        &self.name
-    }
 }
 
 struct CgClass {
@@ -72,6 +53,16 @@ struct CgParentType<T, C> {
     id: T,
     name: String,
     children: Vec<C>,
+}
+
+impl<T: Copy, C: CgEntry<T>> CgEntry<T> for CgParentType<T, C> {
+    fn id(&self) -> T {
+        self.id
+    }
+
+    fn name(&self) -> &str {
+        &self.name
+    }
 }
 
 struct CgType<T> {
@@ -96,17 +87,14 @@ type CgHidType = CgType<u8>;
 type CgRType = CgType<u8>;
 type CgRBiasType = CgType<u8>;
 type CgPhyType = CgType<u8>;
-
 type CgHidUsage = CgType<u16>;
 type CgHut = CgParentType<u8, CgHidUsage>;
-
 type CgDialect = CgType<u8>;
 type CgLang = CgParentType<u16, CgDialect>;
-
 type CgCountryCode = CgType<u8>;
 type CgTerminalType = CgType<u16>;
 
-/// Parser state expects file in be in this order. It's required because some
+/// Parser state parses only the type for the current section, this is because some
 /// parsers are ambiguous without context; device.interface == subclass.protocol for example.
 enum ParserState {
     Vendors(Map<u16>, Option<CgVendor>, u16),
@@ -149,19 +137,14 @@ impl ParserState {
             ParserState::Classes(m, Some(class), _) => {
                 m.entry(class.id, &quote!(#class).to_string());
             }
-            ParserState::AtType(m, Some(t)) => {
+            ParserState::AtType(m, Some(t)) | ParserState::TerminalType(m, Some(t)) => {
                 m.entry(t.id(), &quote!(#t).to_string());
             }
-            ParserState::HidType(m, Some(t)) => {
-                m.entry(t.id(), &quote!(#t).to_string());
-            }
-            ParserState::RType(m, Some(t)) => {
-                m.entry(t.id(), &quote!(#t).to_string());
-            }
-            ParserState::BiasType(m, Some(t)) => {
-                m.entry(t.id(), &quote!(#t).to_string());
-            }
-            ParserState::PhyType(m, Some(t)) => {
+            ParserState::HidType(m, Some(t))
+            | ParserState::RType(m, Some(t))
+            | ParserState::BiasType(m, Some(t))
+            | ParserState::CountryCode(m, Some(t))
+            | ParserState::PhyType(m, Some(t)) => {
                 m.entry(t.id(), &quote!(#t).to_string());
             }
             ParserState::HutType(m, Some(t)) => {
@@ -170,16 +153,13 @@ impl ParserState {
             ParserState::Lang(m, Some(t)) => {
                 m.entry(t.id, &quote!(#t).to_string());
             }
-            ParserState::CountryCode(m, Some(t)) => {
-                m.entry(t.id(), &quote!(#t).to_string());
-            }
-            ParserState::TerminalType(m, Some(t)) => {
-                m.entry(t.id(), &quote!(#t).to_string());
-            }
             _ => {}
         }
     }
 
+    /// Detects the next state based on the header line
+    ///
+    /// Not very efficient but since it only checks # lines it is not terrible
     fn next_from_header(&mut self, line: &str, output: &mut impl Write) -> Option<ParserState> {
         if line.is_empty() || !line.starts_with('#') {
             return None;
@@ -226,7 +206,7 @@ impl ParserState {
                 self.finalize(output);
                 Some(ParserState::TerminalType(Map::<u16>::new(), None))
             }
-            _ => None
+            _ => None,
         }
     }
 
@@ -312,7 +292,7 @@ impl ParserState {
                 } else {
                     panic!("No parent class whilst parsing classes, confirm file in correct order and not malformed: {:?}", line);
                 }
-            },
+            }
             ParserState::AtType(m, ref mut current) => {
                 if let Ok((name, id)) = parser::audio_terminal_type(line) {
                     if let Some(cv) = current {
@@ -327,7 +307,7 @@ impl ParserState {
                 } else {
                     panic!("Invalid audio terminal line: {:?}", line);
                 }
-            },
+            }
             ParserState::HidType(m, ref mut current) => {
                 if let Ok((name, id)) = parser::hid_type(line) {
                     if let Some(cv) = current {
@@ -342,7 +322,7 @@ impl ParserState {
                 } else {
                     panic!("Invalid hid type line: {:?}", line);
                 }
-            },
+            }
             ParserState::RType(m, ref mut current) => {
                 if let Ok((name, id)) = parser::hid_item_type(line) {
                     if let Some(cv) = current {
@@ -357,7 +337,7 @@ impl ParserState {
                 } else {
                     panic!("Invalid hid item type line: {:?}", line);
                 }
-            },
+            }
             ParserState::BiasType(m, ref mut current) => {
                 if let Ok((name, id)) = parser::bias_type(line) {
                     if let Some(cv) = current {
@@ -372,7 +352,7 @@ impl ParserState {
                 } else {
                     panic!("Invalid bias type line: {:?}", line);
                 }
-            },
+            }
             ParserState::PhyType(m, ref mut current) => {
                 if let Ok((name, id)) = parser::phy_type(line) {
                     if let Some(cv) = current {
@@ -387,7 +367,7 @@ impl ParserState {
                 } else {
                     panic!("Invalid phy type line: {:?}", line);
                 }
-            },
+            }
             ParserState::HutType(m, ref mut current) => {
                 if let Ok((name, id)) = parser::hut_type(line) {
                     if let Some(cv) = current {
@@ -410,7 +390,7 @@ impl ParserState {
                 } else {
                     panic!("No parent hut whilst parsing huts, confirm file in correct order and not malformed: {:?}", line);
                 }
-            },
+            }
             ParserState::Lang(m, ref mut current) => {
                 if let Ok((name, id)) = parser::language(line) {
                     if let Some(cv) = current {
@@ -433,7 +413,7 @@ impl ParserState {
                 } else {
                     panic!("No parent lang whilst parsing langs, confirm file in correct order and not malformed: {:?}", line);
                 }
-            },
+            }
             ParserState::CountryCode(m, ref mut current) => {
                 if let Ok((name, id)) = parser::country_code(line) {
                     if let Some(cv) = current {
@@ -448,7 +428,7 @@ impl ParserState {
                 } else {
                     panic!("Invalid country code line: {:?}", line);
                 }
-            },
+            }
             ParserState::TerminalType(m, ref mut current) => {
                 if let Ok((name, id)) = parser::terminal_type(line) {
                     if let Some(cv) = current {
@@ -463,13 +443,13 @@ impl ParserState {
                 } else {
                     panic!("Invalid terminal type line: {:?}", line);
                 }
-            },
+            }
         }
     }
 
-    /// Emit the prologue and map to the output file
+    /// Emit the prologue and map to the output file.
     ///
-    /// Should be used before switching to a new state
+    /// Should only be called once per state, used before switching.
     fn finalize(&mut self, output: &mut impl Write) {
         // Emit any pending contained within
         self.emit();
@@ -485,19 +465,14 @@ impl ParserState {
             ParserState::Classes(m, _, _) => {
                 writeln!(output, "{};", m.build()).unwrap();
             }
-            ParserState::AtType(m, _) => {
+            ParserState::AtType(m, _) | ParserState::TerminalType(m, _) => {
                 writeln!(output, "{};", m.build()).unwrap();
             }
-            ParserState::HidType(m, _) => {
-                writeln!(output, "{};", m.build()).unwrap();
-            }
-            ParserState::RType(m, _) => {
-                writeln!(output, "{};", m.build()).unwrap();
-            }
-            ParserState::BiasType(m, _) => {
-                writeln!(output, "{};", m.build()).unwrap();
-            }
-            ParserState::PhyType(m, _) => {
+            ParserState::HidType(m, _)
+            | ParserState::RType(m, _)
+            | ParserState::BiasType(m, _)
+            | ParserState::CountryCode(m, _)
+            | ParserState::PhyType(m, _) => {
                 writeln!(output, "{};", m.build()).unwrap();
             }
             ParserState::HutType(m, _) => {
@@ -506,13 +481,31 @@ impl ParserState {
             ParserState::Lang(m, _) => {
                 writeln!(output, "{};", m.build()).unwrap();
             }
-            ParserState::CountryCode(m, _) => {
-                writeln!(output, "{};", m.build()).unwrap();
+        }
+    }
+
+    /// Return the next state for the current state based on the standard ordering of the file
+    ///
+    /// Not as robust as the next_from_header but at lot less overhead. The issue is reliably detecting the end of a section; # comments are not reliable as there are some '# typo?' strings
+    #[allow(dead_code)]
+    fn next(&mut self, output: &mut impl Write) -> Option<ParserState> {
+        self.finalize(output);
+        match self {
+            ParserState::Vendors(_, _, _) => {
+                Some(ParserState::Classes(Map::<u8>::new(), None, 0u8))
             }
-            ParserState::TerminalType(m, _) => {
-                writeln!(output, "{};", m.build()).unwrap();
+            ParserState::Classes(_, _, _) => Some(ParserState::AtType(Map::<u16>::new(), None)),
+            ParserState::AtType(_, _) => Some(ParserState::HidType(Map::<u8>::new(), None)),
+            ParserState::HidType(_, _) => Some(ParserState::RType(Map::<u8>::new(), None)),
+            ParserState::RType(_, _) => Some(ParserState::BiasType(Map::<u8>::new(), None)),
+            ParserState::BiasType(_, _) => Some(ParserState::PhyType(Map::<u8>::new(), None)),
+            ParserState::PhyType(_, _) => Some(ParserState::HutType(Map::<u8>::new(), None)),
+            ParserState::HutType(_, _) => Some(ParserState::Lang(Map::<u16>::new(), None)),
+            ParserState::Lang(_, _) => Some(ParserState::CountryCode(Map::<u8>::new(), None)),
+            ParserState::CountryCode(_, _) => {
+                Some(ParserState::TerminalType(Map::<u16>::new(), None))
             }
-            // _ => {}
+            ParserState::TerminalType(_, _) => None,
         }
     }
 }
@@ -533,22 +526,29 @@ fn main() {
 
     // Parser state machine starts with vendors (first in file)
     let mut parser_state: ParserState = ParserState::Vendors(Map::<u16>::new(), None, 0u16);
+    // let mut was_header = false;
 
-    for line in input.lines() {
-        if let Ok(line) = line {
-            if line.is_empty() {
-                continue;
-            }
+    for line in input.lines().flatten() {
+        // Does not work due to presence of '# typo?' lines
+        // if line.starts_with('#') {
+        //     was_header = !matches!(parser_state, ParserState::Vendors(_, None, 0u16));
+        //     continue;
+        // } else if was_header {
+        //     was_header = false;
+        //     match parser_state.next() {
+        //         Some(next_state) => parser_state = next_state,
+        //         None => break,
+        //     }
+        // }
 
-            if let Some(next_state) = parser_state.next_from_header(&line, &mut output) {
-                parser_state = next_state;
-            }
-
-            parser_state.process(&line);
+        if let Some(next_state) = parser_state.next_from_header(&line, &mut output) {
+            parser_state = next_state;
         }
+
+        parser_state.process(&line);
     }
 
-    // last call
+    // last call for last parser in file
     parser_state.finalize(&mut output);
 
     println!("cargo:rerun-if-changed=build.rs");
@@ -689,7 +689,7 @@ impl quote::ToTokens for CgClass {
         } = self;
 
         let sub_classes = sub_classes.iter().map(|CgSubClass { id, name, children }| {
-            quote!{
+            quote! {
                 SubClass { class_id: #class_id, id: #id, name: #name, protocols: &[#(#children),*] }
             }
         });
