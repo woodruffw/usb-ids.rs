@@ -382,7 +382,7 @@ const DIALECT_TAG: u8 = 7;
 const HCC_TAG: u8 = 8;
 const VT_TAG: u8 = 9;
 
-/// Represents a subclass protocol in the USB database. 
+/// Represents a subclass protocol in the USB database.
 ///
 /// Protocols are part of the USB class code triplet (base class, subclass,
 /// protocol), contained within a [`SubClass`].

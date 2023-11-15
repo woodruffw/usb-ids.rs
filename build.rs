@@ -11,7 +11,7 @@ use quote::quote;
  * of context needed for pairing nested entities (e.g. devices) with their parents (e.g. vendors).
  */
 
-// these are the definitions for the generated maps
+// these are the definitions for the generated maps that will be written to the source file
 const VENDOR_PROLOGUE: &str = "static USB_IDS: phf::Map<u16, Vendor> = ";
 const CLASS_PROLOGUE: &str = "static USB_CLASSES: phf::Map<u8, Class> = ";
 const AUDIO_TERMINAL_PROLOGUE: &str = "static USB_AUDIO_TERMINALS: phf::Map<u16, AudioTerminal> = ";
@@ -159,50 +159,50 @@ impl ParserState {
 
     /// Detects the next state based on the header line
     ///
-    /// Not very efficient but since it only checks # lines it is not terrible
+    /// Not very efficient but since it only checks # lines and required length it is not terrible
     fn next_from_header(&mut self, line: &str, output: &mut impl Write) -> Option<ParserState> {
-        if line.is_empty() || !line.starts_with('#') {
+        if line.len() < 7 || !line.starts_with('#') {
             return None;
         }
 
-        match line {
-            "# C class  class_name" => {
+        match &line[..7] {
+            "# C cla" => {
                 self.finalize(output);
                 Some(ParserState::Classes(Map::<u8>::new(), None, 0u8))
             }
-            "# AT terminal_type  terminal_type_name" => {
+            "# AT te" => {
                 self.finalize(output);
                 Some(ParserState::AtType(Map::<u16>::new(), None))
             }
-            "# HID descriptor_type  descriptor_type_name" => {
+            "# HID d" => {
                 self.finalize(output);
                 Some(ParserState::HidType(Map::<u8>::new(), None))
             }
-            "# R item_type  item_type_name" => {
+            "# R ite" => {
                 self.finalize(output);
                 Some(ParserState::RType(Map::<u8>::new(), None))
             }
-            "# BIAS item_type  item_type_name" => {
+            "# BIAS " => {
                 self.finalize(output);
                 Some(ParserState::BiasType(Map::<u8>::new(), None))
             }
-            "# PHY item_type  item_type_name" => {
+            "# PHY i" => {
                 self.finalize(output);
                 Some(ParserState::PhyType(Map::<u8>::new(), None))
             }
-            "# HUT hi  _usage_page  hid_usage_page_name" => {
+            "# HUT h" => {
                 self.finalize(output);
                 Some(ParserState::HutType(Map::<u8>::new(), None))
             }
-            "# L language_id  language_name" => {
+            "# L lan" => {
                 self.finalize(output);
                 Some(ParserState::Lang(Map::<u16>::new(), None))
             }
-            "# HCC country_code keymap_type" => {
+            "# HCC c" => {
                 self.finalize(output);
                 Some(ParserState::CountryCode(Map::<u8>::new(), None))
             }
-            "# VT terminal_type  terminal_type_name" => {
+            "# VT te" => {
                 self.finalize(output);
                 Some(ParserState::TerminalType(Map::<u16>::new(), None))
             }
@@ -526,29 +526,18 @@ fn main() {
 
     // Parser state machine starts with vendors (first in file)
     let mut parser_state: ParserState = ParserState::Vendors(Map::<u16>::new(), None, 0u16);
-    // let mut was_header = false;
 
     for line in input.lines().flatten() {
-        // Does not work due to presence of '# typo?' lines
-        // if line.starts_with('#') {
-        //     was_header = !matches!(parser_state, ParserState::Vendors(_, None, 0u16));
-        //     continue;
-        // } else if was_header {
-        //     was_header = false;
-        //     match parser_state.next() {
-        //         Some(next_state) => parser_state = next_state,
-        //         None => break,
-        //     }
-        // }
-
+        // Check for a state change based on the header comments
         if let Some(next_state) = parser_state.next_from_header(&line, &mut output) {
             parser_state = next_state;
         }
 
+        // Process line for current parser
         parser_state.process(&line);
     }
 
-    // last call for last parser in file
+    // Last call for last parser in file
     parser_state.finalize(&mut output);
 
     println!("cargo:rerun-if-changed=build.rs");
