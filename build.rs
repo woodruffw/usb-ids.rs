@@ -232,7 +232,10 @@ impl ParserState {
                         devices: vec![],
                     });
                 // We should always have a current vendor; failure here indicates a malformed input.
-                } else if let Some(curr_vendor) = curr_vendor.as_mut() {
+                } else {
+                    let curr_vendor = curr_vendor
+                        .as_mut()
+                        .expect("No parent vendor whilst parsing vendors");
                     if let Ok((name, id)) = parser::device(line) {
                         curr_vendor.devices.push(CgDevice {
                             id,
@@ -245,15 +248,13 @@ impl ParserState {
                             .devices
                             .iter_mut()
                             .find(|d| d.id == *curr_device_id)
-                            .expect("No parent device whilst parsing interfaces, confirm file not malformed");
+                            .expect("No parent device whilst parsing interfaces");
 
                         curr_device.interfaces.push(CgInterface {
                             id,
                             name: name.into(),
                         });
                     }
-                } else {
-                    panic!("No parent vendor whilst parsing vendors, confirm file in correct order and not malformed: {:?}", line);
                 }
             }
             ParserState::Classes(m, ref mut curr_class, ref mut curr_class_id) => {
@@ -268,8 +269,10 @@ impl ParserState {
                         name: name.into(),
                         sub_classes: vec![],
                     });
-                // We should always have a current class; failure here indicates a malformed input.
-                } else if let Some(curr_class) = curr_class.as_mut() {
+                } else {
+                    let curr_class = curr_class
+                        .as_mut()
+                        .expect("No parent class whilst parsing classes");
                     if let Ok((name, id)) = parser::sub_class(line) {
                         curr_class.sub_classes.push(CgSubClass {
                             id,
@@ -282,91 +285,75 @@ impl ParserState {
                             .sub_classes
                             .iter_mut()
                             .find(|d| d.id == *curr_class_id)
-                            .expect("No parent sub-class whilst parsing protocols, confirm file not malformed");
+                            .expect("No parent sub-class whilst parsing protocols");
 
                         curr_device.children.push(CgProtocol {
                             id,
                             name: name.into(),
                         });
                     }
-                } else {
-                    panic!("No parent class whilst parsing classes, confirm file in correct order and not malformed: {:?}", line);
                 }
             }
             ParserState::AtType(m, ref mut current) => {
-                if let Ok((name, id)) = parser::audio_terminal_type(line) {
-                    if let Some(cv) = current {
-                        m.entry(cv.id, &quote!(#cv).to_string());
-                    }
-
-                    // Set our new class as the current class.
-                    *current = Some(CgAtType {
-                        id,
-                        name: name.into(),
-                    });
-                } else {
-                    panic!("Invalid audio terminal line: {:?}", line);
+                let (name, id) =
+                    parser::audio_terminal_type(line).expect("Invalid audio terminal line");
+                if let Some(cv) = current {
+                    m.entry(cv.id, &quote!(#cv).to_string());
                 }
+
+                // Set our new class as the current class.
+                *current = Some(CgAtType {
+                    id,
+                    name: name.into(),
+                });
             }
             ParserState::HidType(m, ref mut current) => {
-                if let Ok((name, id)) = parser::hid_type(line) {
-                    if let Some(cv) = current {
-                        m.entry(cv.id, &quote!(#cv).to_string());
-                    }
-
-                    // Set our new class as the current class.
-                    *current = Some(CgHidType {
-                        id,
-                        name: name.into(),
-                    });
-                } else {
-                    panic!("Invalid hid type line: {:?}", line);
+                let (name, id) = parser::hid_type(line).expect("Invalid hid type line");
+                if let Some(cv) = current {
+                    m.entry(cv.id, &quote!(#cv).to_string());
                 }
+
+                // Set our new class as the current class.
+                *current = Some(CgHidType {
+                    id,
+                    name: name.into(),
+                });
             }
             ParserState::RType(m, ref mut current) => {
-                if let Ok((name, id)) = parser::hid_item_type(line) {
-                    if let Some(cv) = current {
-                        m.entry(cv.id, &quote!(#cv).to_string());
-                    }
-
-                    // Set our new class as the current class.
-                    *current = Some(CgRType {
-                        id,
-                        name: name.into(),
-                    });
-                } else {
-                    panic!("Invalid hid item type line: {:?}", line);
+                let (name, id) = parser::hid_item_type(line).expect("Invalid hid item type line");
+                if let Some(cv) = current {
+                    m.entry(cv.id, &quote!(#cv).to_string());
                 }
+
+                // Set our new class as the current class.
+                *current = Some(CgRType {
+                    id,
+                    name: name.into(),
+                });
             }
             ParserState::BiasType(m, ref mut current) => {
-                if let Ok((name, id)) = parser::bias_type(line) {
-                    if let Some(cv) = current {
-                        m.entry(cv.id, &quote!(#cv).to_string());
-                    }
-
-                    // Set our new class as the current class.
-                    *current = Some(CgRBiasType {
-                        id,
-                        name: name.into(),
-                    });
-                } else {
-                    panic!("Invalid bias type line: {:?}", line);
+                let (name, id) = parser::bias_type(line).expect("Invalid bias type line");
+                if let Some(cv) = current {
+                    m.entry(cv.id, &quote!(#cv).to_string());
                 }
+
+                // Set our new class as the current class.
+                *current = Some(CgRBiasType {
+                    id,
+                    name: name.into(),
+                });
             }
             ParserState::PhyType(m, ref mut current) => {
-                if let Ok((name, id)) = parser::phy_type(line) {
-                    if let Some(cv) = current {
-                        m.entry(cv.id, &quote!(#cv).to_string());
-                    }
-
-                    // Set our new class as the current class.
-                    *current = Some(CgPhyType {
-                        id,
-                        name: name.into(),
-                    });
-                } else {
-                    panic!("Invalid phy type line: {:?}", line);
+                let (name, id) = parser::phy_type(line).expect("Invalid phy type line");
+                if let Some(cv) = current {
+                    m.entry(cv.id, &quote!(#cv).to_string());
                 }
+
+                // Set our new class as the current class.
+                *current = Some(CgPhyType {
+                    id,
+                    name: name.into(),
+                });
             }
             ParserState::HutType(m, ref mut current) => {
                 if let Ok((name, id)) = parser::hut_type(line) {
@@ -380,15 +367,14 @@ impl ParserState {
                         name: name.into(),
                         children: vec![],
                     });
-                } else if let Some(curr_hut) = current.as_mut() {
+                } else {
+                    let curr_hut = current.as_mut().expect("No parent hut whilst parsing huts");
                     if let Ok((name, id)) = parser::hid_usage_name(line) {
                         curr_hut.children.push(CgHidUsage {
                             id,
                             name: name.into(),
                         });
                     }
-                } else {
-                    panic!("No parent hut whilst parsing huts, confirm file in correct order and not malformed: {:?}", line);
                 }
             }
             ParserState::Lang(m, ref mut current) => {
@@ -403,46 +389,41 @@ impl ParserState {
                         name: name.into(),
                         children: vec![],
                     });
-                } else if let Some(curr_lang) = current.as_mut() {
+                } else {
+                    let curr_lang = current
+                        .as_mut()
+                        .expect("No parent lang whilst parsing langs");
                     if let Ok((name, id)) = parser::dialect(line) {
                         curr_lang.children.push(CgDialect {
                             id,
                             name: name.into(),
                         });
                     }
-                } else {
-                    panic!("No parent lang whilst parsing langs, confirm file in correct order and not malformed: {:?}", line);
                 }
             }
             ParserState::CountryCode(m, ref mut current) => {
-                if let Ok((name, id)) = parser::country_code(line) {
-                    if let Some(cv) = current {
-                        m.entry(cv.id, &quote!(#cv).to_string());
-                    }
-
-                    // Set our new class as the current class.
-                    *current = Some(CgCountryCode {
-                        id,
-                        name: name.into(),
-                    });
-                } else {
-                    panic!("Invalid country code line: {:?}", line);
+                let (name, id) = parser::country_code(line).expect("Invalid country code line");
+                if let Some(cv) = current {
+                    m.entry(cv.id, &quote!(#cv).to_string());
                 }
+
+                // Set our new class as the current class.
+                *current = Some(CgCountryCode {
+                    id,
+                    name: name.into(),
+                });
             }
             ParserState::TerminalType(m, ref mut current) => {
-                if let Ok((name, id)) = parser::terminal_type(line) {
-                    if let Some(cv) = current {
-                        m.entry(cv.id, &quote!(#cv).to_string());
-                    }
-
-                    // Set our new class as the current class.
-                    *current = Some(CgTerminalType {
-                        id,
-                        name: name.into(),
-                    });
-                } else {
-                    panic!("Invalid terminal type line: {:?}", line);
+                let (name, id) = parser::terminal_type(line).expect("Invalid terminal type line");
+                if let Some(cv) = current {
+                    m.entry(cv.id, &quote!(#cv).to_string());
                 }
+
+                // Set our new class as the current class.
+                *current = Some(CgTerminalType {
+                    id,
+                    name: name.into(),
+                });
             }
         }
     }
