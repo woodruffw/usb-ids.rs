@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] - ReleaseDate
 
+* Support for additional identities in the USB ID repository has been
+  expanded significantly; see the docs for additional new APIs.
+  [#50](https://github.com/woodruffw/usb-ids.rs/pull/50)
+
 ## [1.2023.6] - 2023-10-18
 
 ## [1.2023.5] - 2023-08-25
