@@ -14,7 +14,7 @@ jobs:
           curl -o src/usb.ids https://usb-ids.gowdy.us/usb.ids
 
       - name: create PR
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           commit-message: "[BOT] update usb.ids"
           branch: update-usbids
