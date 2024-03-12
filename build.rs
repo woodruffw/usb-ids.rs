@@ -508,6 +508,7 @@ fn main() {
     // Parser state machine starts with vendors (first in file)
     let mut parser_state: ParserState = ParserState::Vendors(Map::<u16>::new(), None, 0u16);
 
+    #[allow(clippy::lines_filter_map_ok)]
     for line in input.lines().flatten() {
         // Check for a state change based on the header comments
         if let Some(next_state) = parser_state.next_from_header(&line, &mut output) {
