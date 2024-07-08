@@ -2,7 +2,7 @@
 name = "usb-ids"
 description = "Rust wrappers for the USB ID Repository"
 license = "MIT"
-version = "1.2024.3"
+version = "1.2024.4"
 authors = ["William Woodruff <william@yossarian.net>"]
 edition = "2018"
 readme = "README.md"
