@@ -26,7 +26,6 @@ const TERMINAL_PROLOGUE: &str = "static USB_VIDEO_TERMINALS: phf::Map<u16, Video
 
 trait CgEntry<T> {
     fn id(&self) -> T;
-    fn name(&self) -> &str;
 }
 
 struct CgVendor {
@@ -59,10 +58,6 @@ impl<T: Copy, C: CgEntry<T>> CgEntry<T> for CgParentType<T, C> {
     fn id(&self) -> T {
         self.id
     }
-
-    fn name(&self) -> &str {
-        &self.name
-    }
 }
 
 struct CgType<T> {
@@ -73,10 +68,6 @@ struct CgType<T> {
 impl<T: Copy> CgEntry<T> for CgType<T> {
     fn id(&self) -> T {
         self.id
-    }
-
-    fn name(&self) -> &str {
-        &self.name
     }
 }
 
