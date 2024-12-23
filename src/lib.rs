@@ -662,6 +662,13 @@ mod tests {
     }
 
     #[test]
+    fn test_from_id_whanam() {
+        let vendor = Vendor::from_id(0x0c68).unwrap();
+        assert_eq!(vendor.name(), "Whanam Electronics Co., Ltd.");
+        assert_eq!(vendor.id(), 0x0c68);
+    }
+
+    #[test]
     fn test_vendor_devices() {
         let vendor = Vendor::from_id(0x1d6b).unwrap();
 
