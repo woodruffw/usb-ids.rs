@@ -533,7 +533,8 @@ mod parser {
         move |input| {
             map_res(map_parser(take(size), all_consuming(hex_digit1)), |input| {
                 from_str_radix(input, 16)
-            }).parse(input)
+            })
+            .parse(input)
         }
     }
 
