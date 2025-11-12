@@ -524,7 +524,7 @@ mod parser {
     use nom::character::complete::{hex_digit1, tab};
     use nom::combinator::{all_consuming, map_parser, map_res};
     use nom::sequence::{delimited, terminated};
-    use nom::IResult;
+    use nom::{IResult, Parser};
 
     fn id<T, F>(size: usize, from_str_radix: F) -> impl Fn(&str) -> IResult<&str, T>
     where
@@ -533,93 +533,93 @@ mod parser {
         move |input| {
             map_res(map_parser(take(size), all_consuming(hex_digit1)), |input| {
                 from_str_radix(input, 16)
-            })(input)
+            }).parse(input)
         }
     }
 
     pub fn vendor(input: &str) -> IResult<&str, u16> {
         let id = id(4, u16::from_str_radix);
-        terminated(id, tag("  "))(input)
+        terminated(id, tag("  ")).parse(input)
     }
 
     pub fn device(input: &str) -> IResult<&str, u16> {
         let id = id(4, u16::from_str_radix);
-        delimited(tab, id, tag("  "))(input)
+        delimited(tab, id, tag("  ")).parse(input)
     }
 
     pub fn interface(input: &str) -> IResult<&str, u8> {
         let id = id(2, u8::from_str_radix);
-        delimited(tag("\t\t"), id, tag("  "))(input)
+        delimited(tag("\t\t"), id, tag("  ")).parse(input)
     }
 
     pub fn class(input: &str) -> IResult<&str, u8> {
         let id = id(2, u8::from_str_radix);
-        delimited(tag("C "), id, tag("  "))(input)
+        delimited(tag("C "), id, tag("  ")).parse(input)
     }
 
     pub fn sub_class(input: &str) -> IResult<&str, u8> {
         let id = id(2, u8::from_str_radix);
-        delimited(tab, id, tag("  "))(input)
+        delimited(tab, id, tag("  ")).parse(input)
     }
 
     pub fn protocol(input: &str) -> IResult<&str, u8> {
         let id = id(2, u8::from_str_radix);
-        delimited(tag("\t\t"), id, tag("  "))(input)
+        delimited(tag("\t\t"), id, tag("  ")).parse(input)
     }
 
     pub fn audio_terminal_type(input: &str) -> IResult<&str, u16> {
         let id = id(4, u16::from_str_radix);
-        delimited(tag("AT "), id, tag("  "))(input)
+        delimited(tag("AT "), id, tag("  ")).parse(input)
     }
 
     pub fn hid_type(input: &str) -> IResult<&str, u8> {
         let id = id(2, u8::from_str_radix);
-        delimited(tag("HID "), id, tag("  "))(input)
+        delimited(tag("HID "), id, tag("  ")).parse(input)
     }
 
     pub fn hid_item_type(input: &str) -> IResult<&str, u8> {
         let id = id(2, u8::from_str_radix);
-        delimited(tag("R "), id, tag("  "))(input)
+        delimited(tag("R "), id, tag("  ")).parse(input)
     }
 
     pub fn bias_type(input: &str) -> IResult<&str, u8> {
         let id = id(1, u8::from_str_radix);
-        delimited(tag("BIAS "), id, tag("  "))(input)
+        delimited(tag("BIAS "), id, tag("  ")).parse(input)
     }
 
     pub fn phy_type(input: &str) -> IResult<&str, u8> {
         let id = id(2, u8::from_str_radix);
-        delimited(tag("PHY "), id, tag("  "))(input)
+        delimited(tag("PHY "), id, tag("  ")).parse(input)
     }
 
     pub fn hut_type(input: &str) -> IResult<&str, u8> {
         let id = id(2, u8::from_str_radix);
-        delimited(tag("HUT "), id, tag("  "))(input)
+        delimited(tag("HUT "), id, tag("  ")).parse(input)
     }
 
     pub fn hid_usage_name(input: &str) -> IResult<&str, u16> {
         let id = id(3, u16::from_str_radix);
-        delimited(tab, id, tag("  "))(input)
+        delimited(tab, id, tag("  ")).parse(input)
     }
 
     pub fn language(input: &str) -> IResult<&str, u16> {
         let id = id(4, u16::from_str_radix);
-        delimited(tag("L "), id, tag("  "))(input)
+        delimited(tag("L "), id, tag("  ")).parse(input)
     }
 
     pub fn dialect(input: &str) -> IResult<&str, u8> {
         let id = id(2, u8::from_str_radix);
-        delimited(tab, id, tag("  "))(input)
+        delimited(tab, id, tag("  ")).parse(input)
     }
 
     pub fn country_code(input: &str) -> IResult<&str, u8> {
         let id = id(2, u8::from_str_radix);
-        delimited(tag("HCC "), id, tag("  "))(input)
+        delimited(tag("HCC "), id, tag("  ")).parse(input)
     }
 
     pub fn terminal_type(input: &str) -> IResult<&str, u16> {
         let id = id(4, u16::from_str_radix);
-        delimited(tag("VT "), id, tag("  "))(input)
+        delimited(tag("VT "), id, tag("  ")).parse(input)
     }
 }
 
