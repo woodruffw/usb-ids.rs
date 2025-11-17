@@ -87,21 +87,21 @@ type CgTerminalType = CgType<u16>;
 
 /// Parser state parses only the type for the current section, this is because some
 /// parsers are ambiguous without context; device.interface == subclass.protocol for example.
-enum ParserState {
-    Vendors(Map<u16>, Option<CgVendor>, u16),
-    Classes(Map<u8>, Option<CgClass>, u8),
-    AtType(Map<u16>, Option<CgAtType>),
-    HidType(Map<u8>, Option<CgHidType>),
-    RType(Map<u8>, Option<CgRType>),
-    BiasType(Map<u8>, Option<CgRBiasType>),
-    PhyType(Map<u8>, Option<CgPhyType>),
-    HutType(Map<u8>, Option<CgHut>),
-    Lang(Map<u16>, Option<CgLang>),
-    CountryCode(Map<u8>, Option<CgCountryCode>),
-    TerminalType(Map<u16>, Option<CgTerminalType>),
+enum ParserState<'a> {
+    Vendors(Map<'a, u16>, Option<CgVendor>, u16),
+    Classes(Map<'a, u8>, Option<CgClass>, u8),
+    AtType(Map<'a, u16>, Option<CgAtType>),
+    HidType(Map<'a, u8>, Option<CgHidType>),
+    RType(Map<'a, u8>, Option<CgRType>),
+    BiasType(Map<'a, u8>, Option<CgRBiasType>),
+    PhyType(Map<'a, u8>, Option<CgPhyType>),
+    HutType(Map<'a, u8>, Option<CgHut>),
+    Lang(Map<'a, u16>, Option<CgLang>),
+    CountryCode(Map<'a, u8>, Option<CgCountryCode>),
+    TerminalType(Map<'a, u16>, Option<CgTerminalType>),
 }
 
-impl ParserState {
+impl<'a> ParserState<'a> {
     /// Return the prologue string for the current state; the type definition
     fn prologue_str(&self) -> &'static str {
         match self {
@@ -123,26 +123,26 @@ impl ParserState {
     fn emit(&mut self) {
         match self {
             ParserState::Vendors(m, Some(vendor), _) => {
-                m.entry(vendor.id, &quote!(#vendor).to_string());
+                m.entry(vendor.id, quote!(#vendor).to_string());
             }
             ParserState::Classes(m, Some(class), _) => {
-                m.entry(class.id, &quote!(#class).to_string());
+                m.entry(class.id, quote!(#class).to_string());
             }
             ParserState::AtType(m, Some(t)) | ParserState::TerminalType(m, Some(t)) => {
-                m.entry(t.id(), &quote!(#t).to_string());
+                m.entry(t.id(), quote!(#t).to_string());
             }
             ParserState::HidType(m, Some(t))
             | ParserState::RType(m, Some(t))
             | ParserState::BiasType(m, Some(t))
             | ParserState::CountryCode(m, Some(t))
             | ParserState::PhyType(m, Some(t)) => {
-                m.entry(t.id(), &quote!(#t).to_string());
+                m.entry(t.id(), quote!(#t).to_string());
             }
             ParserState::HutType(m, Some(t)) => {
-                m.entry(t.id, &quote!(#t).to_string());
+                m.entry(t.id, quote!(#t).to_string());
             }
             ParserState::Lang(m, Some(t)) => {
-                m.entry(t.id, &quote!(#t).to_string());
+                m.entry(t.id, quote!(#t).to_string());
             }
             _ => {}
         }
@@ -151,7 +151,7 @@ impl ParserState {
     /// Detects the next state based on the header line
     ///
     /// Not very efficient but since it only checks # lines and required length it is not terrible
-    fn next_from_header(&mut self, line: &str, output: &mut impl Write) -> Option<ParserState> {
+    fn next_from_header(&mut self, line: &str, output: &mut impl Write) -> Option<ParserState<'a>> {
         if line.len() < 7 || !line.starts_with('#') {
             return None;
         }
@@ -213,7 +213,7 @@ impl ParserState {
             ParserState::Vendors(m, ref mut curr_vendor, ref mut curr_device_id) => {
                 if let Ok((name, id)) = parser::vendor(line) {
                     if let Some(cv) = curr_vendor {
-                        m.entry(cv.id, &quote!(#cv).to_string());
+                        m.entry(cv.id, quote!(#cv).to_string());
                     }
 
                     // Set our new vendor as the current vendor.
@@ -251,7 +251,7 @@ impl ParserState {
             ParserState::Classes(m, ref mut curr_class, ref mut curr_class_id) => {
                 if let Ok((name, id)) = parser::class(line) {
                     if let Some(cv) = curr_class {
-                        m.entry(cv.id, &quote!(#cv).to_string());
+                        m.entry(cv.id, quote!(#cv).to_string());
                     }
 
                     // Set our new class as the current class.
@@ -289,7 +289,7 @@ impl ParserState {
                 let (name, id) =
                     parser::audio_terminal_type(line).expect("Invalid audio terminal line");
                 if let Some(cv) = current {
-                    m.entry(cv.id, &quote!(#cv).to_string());
+                    m.entry(cv.id, quote!(#cv).to_string());
                 }
 
                 // Set our new class as the current class.
@@ -301,7 +301,7 @@ impl ParserState {
             ParserState::HidType(m, ref mut current) => {
                 let (name, id) = parser::hid_type(line).expect("Invalid hid type line");
                 if let Some(cv) = current {
-                    m.entry(cv.id, &quote!(#cv).to_string());
+                    m.entry(cv.id, quote!(#cv).to_string());
                 }
 
                 // Set our new class as the current class.
@@ -313,7 +313,7 @@ impl ParserState {
             ParserState::RType(m, ref mut current) => {
                 let (name, id) = parser::hid_item_type(line).expect("Invalid hid item type line");
                 if let Some(cv) = current {
-                    m.entry(cv.id, &quote!(#cv).to_string());
+                    m.entry(cv.id, quote!(#cv).to_string());
                 }
 
                 // Set our new class as the current class.
@@ -325,7 +325,7 @@ impl ParserState {
             ParserState::BiasType(m, ref mut current) => {
                 let (name, id) = parser::bias_type(line).expect("Invalid bias type line");
                 if let Some(cv) = current {
-                    m.entry(cv.id, &quote!(#cv).to_string());
+                    m.entry(cv.id, quote!(#cv).to_string());
                 }
 
                 // Set our new class as the current class.
@@ -337,7 +337,7 @@ impl ParserState {
             ParserState::PhyType(m, ref mut current) => {
                 let (name, id) = parser::phy_type(line).expect("Invalid phy type line");
                 if let Some(cv) = current {
-                    m.entry(cv.id, &quote!(#cv).to_string());
+                    m.entry(cv.id, quote!(#cv).to_string());
                 }
 
                 // Set our new class as the current class.
@@ -349,7 +349,7 @@ impl ParserState {
             ParserState::HutType(m, ref mut current) => {
                 if let Ok((name, id)) = parser::hut_type(line) {
                     if let Some(cv) = current {
-                        m.entry(cv.id, &quote!(#cv).to_string());
+                        m.entry(cv.id, quote!(#cv).to_string());
                     }
 
                     // Set our new class as the current class.
@@ -371,7 +371,7 @@ impl ParserState {
             ParserState::Lang(m, ref mut current) => {
                 if let Ok((name, id)) = parser::language(line) {
                     if let Some(cv) = current {
-                        m.entry(cv.id, &quote!(#cv).to_string());
+                        m.entry(cv.id, quote!(#cv).to_string());
                     }
 
                     // Set our new class as the current class.
@@ -395,7 +395,7 @@ impl ParserState {
             ParserState::CountryCode(m, ref mut current) => {
                 let (name, id) = parser::country_code(line).expect("Invalid country code line");
                 if let Some(cv) = current {
-                    m.entry(cv.id, &quote!(#cv).to_string());
+                    m.entry(cv.id, quote!(#cv).to_string());
                 }
 
                 // Set our new class as the current class.
@@ -407,7 +407,7 @@ impl ParserState {
             ParserState::TerminalType(m, ref mut current) => {
                 let (name, id) = parser::terminal_type(line).expect("Invalid terminal type line");
                 if let Some(cv) = current {
-                    m.entry(cv.id, &quote!(#cv).to_string());
+                    m.entry(cv.id, quote!(#cv).to_string());
                 }
 
                 // Set our new class as the current class.
@@ -460,7 +460,7 @@ impl ParserState {
     ///
     /// Not as robust as the next_from_header but at lot less overhead. The issue is reliably detecting the end of a section; # comments are not reliable as there are some '# typo?' strings
     #[allow(dead_code)]
-    fn next(&mut self, output: &mut impl Write) -> Option<ParserState> {
+    fn next(&mut self, output: &mut impl Write) -> Option<ParserState<'a>> {
         self.finalize(output);
         match self {
             ParserState::Vendors(_, _, _) => {
