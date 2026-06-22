@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: Release
         run: |
-          gh release create --repo woodruffw/usb-ids.rs --draft --verify-tag ${PRERELEASE_FLAG} "${RELEASE_TAG}" --title "${RELEASE_TAG}"
+          gh release create --repo woodruffw/usb-ids.rs --verify-tag ${PRERELEASE_FLAG} "${RELEASE_TAG}" --title "${RELEASE_TAG}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ needs.plan-release.outputs.release-tag }}
