@@ -25,7 +25,6 @@ jobs:
         with:
           commit-message: "[BOT] update usb.ids"
           branch: update-usbids
-          branch-suffix: timestamp
           title: "[BOT] update usb.ids"
           body: |
             This is an automated pull request, updating `usb.ids` after a detected change.
